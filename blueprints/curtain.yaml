@@ -1,0 +1,70 @@
+blueprint:
+  name: Curtain
+  domain: automation
+  input:
+    button_device_id:
+      name: Button
+      selector:
+        device:
+          filter:
+            - integration: mqtt
+              model: Smart button
+            - integration: mqtt
+              model: Wireless switch with 1 button
+    curtain_entity_ids:
+      name: Curtain
+      selector:
+        entity:
+          filter:
+            - domain: cover
+          multiple: true
+
+triggers:
+  - domain: mqtt
+    device_id: !input button_device_id
+    type: action
+    id: button_double_press
+    subtype: double
+    trigger: device
+  - domain: mqtt
+    device_id: !input button_device_id
+    type: action
+    id: button_hold_press
+    subtype: hold
+    trigger: device
+actions:
+  - repeat:
+      for_each: !input curtain_entity_ids
+      sequence:
+        - variables:
+            curtain_entity: "{{ repeat.item }}"
+            trigger_id: "{{ trigger.id }}"
+            curtain_state: "{{ states(curtain_entity) }}"
+            curtain_open: "{{ is_state(curtain_entity, 'open') }}"
+            button_double_press: "{{ trigger_id == 'button_double_press' }}"
+            button_hold_press: "{{ trigger_id == 'button_hold_press' }}"
+        - if: 
+          - condition: template
+            value_template: "{{ curtain_open and button_double_press }}"
+          then:
+            - service: cover.close_cover
+              target:
+                entity_id: "{{ curtain_entity }}"
+              data: {}
+        - if:
+          - condition: template
+            value_template: "{{ (not curtain_open) and button_double_press }}"
+          then:
+            - service: cover.open_cover
+              target:
+                entity_id: "{{ curtain_entity }}"
+              data: {}
+        - if: 
+          - condition: template
+            value_template: "{{ button_hold_press }}"
+          then:
+            - service: cover.stop_cover
+              target:
+                entity_id: "{{ curtain_entity }}"
+              data: {}
+mode: single
