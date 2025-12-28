@@ -54,9 +54,10 @@ actions:
         - variables:
             switch_entity: "{{ repeat.item }}"
             trigger_id: "{{ trigger.id }}"
-            button_single_press: "{{ trigger_id == 'button_single_press' and 'button_single_press' in !input triggers }}"
-            button_double_press: "{{ trigger_id == 'button_double_press' and 'button_double_press' in !input triggers }}"
-            button_hold_press: "{{ trigger_id == 'button_hold_press' and 'button_hold_press' in !input triggers }}"
+            input_triggers: !input triggers
+            button_single_press: "{{ trigger_id == 'button_single_press' and 'button_single_press' in input_triggers }}"
+            button_double_press: "{{ trigger_id == 'button_double_press' and 'button_double_press' in input_triggers }}"
+            button_hold_press: "{{ trigger_id == 'button_hold_press' and 'button_hold_press' in input_triggers }}"
         - if:
             - condition: template
               value_template: "{{ button_single_press or button_double_press or button_hold_press }}"
