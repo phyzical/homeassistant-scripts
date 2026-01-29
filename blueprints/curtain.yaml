@@ -85,8 +85,8 @@ actions:
             trigger_id: "{{ trigger.id }}"
             curtain_state: "{{ states(curtain_entity) }}"
             curtain_open: "{{ is_state(curtain_entity, 'open') }}"
-            button_double_press: "{{ trigger_id == 'toggle_press' }}"
-            button_hold_press: "{{ trigger_id == 'hold_press' }}"
+            toggle_press: "{{ trigger_id == 'toggle_press' }}"
+            hold_press: "{{ trigger_id == 'hold_press' }}"
         - if: 
           - condition: template
             value_template: "{{ curtain_open and toggle_press }}"
