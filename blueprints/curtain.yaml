@@ -11,6 +11,17 @@ blueprint:
               model: Smart button
             - integration: mqtt
               model: Wireless switch with 1 button
+            - integration: mqtt
+              model: Star Ring 4 Gang Scene Switch
+    button_number:
+      name: Button Number
+      selector:
+        select:
+          options:
+            - 1
+            - 2
+            - 3
+            - 4
     curtain_entity_ids:
       name: Curtain
       selector:
@@ -29,8 +40,20 @@ triggers:
   - domain: mqtt
     device_id: !input button_device_id
     type: action
+    id: button_double_press
+    subtype: "{{ !input 'custom_topic_variable' }}_double"
+    trigger: device
+  - domain: mqtt
+    device_id: !input button_device_id
+    type: action
     id: button_hold_press
     subtype: hold
+    trigger: device
+  - domain: mqtt
+    device_id: !input button_device_id
+    type: action
+    id: button_hold_press
+    subtype: "{{ !input 'custom_topic_variable' }}_hold"
     trigger: device
 actions:
   - repeat:
