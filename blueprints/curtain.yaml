@@ -15,6 +15,7 @@ blueprint:
               model: Star Ring 4 Gang Scene Switch
     button_number:
       name: Button Number
+      description: Has no effect when its a single button
       selector:
         select:
           mode: dropdown 
