@@ -22,12 +22,24 @@ blueprint:
       name: Triggers
       selector:
         select:
+          mode: dropdown 
           options:
-            - button_double_press
-            - button_hold_press
-            - button_single_press
+            - "single"
+            - "hold"
+            - "double"
+            - "1_single"
+            - "1_hold"
+            - "1_double"
+            - "2_single"
+            - "2_hold"
+            - "2_double"
+            - "3_single"
+            - "3_hold"
+            - "3_double"
+            - "4_single"
+            - "4_hold"
+            - "4_double"  
           multiple: true
-
 triggers:
   - domain: mqtt
     device_id: !input button_device_id
