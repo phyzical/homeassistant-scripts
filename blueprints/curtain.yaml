@@ -35,7 +35,7 @@ blueprint:
             - "4_hold"
             - "4_double"    
     hold_trigger:
-      name: Hole trigger
+      name: Hold trigger
       selector:
         select:
           mode: dropdown 
