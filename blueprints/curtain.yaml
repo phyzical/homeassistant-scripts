@@ -47,7 +47,7 @@ triggers:
     device_id: !input button_device_id
     type: action
     id: button_double_press
-    subtype: "{{ !input button_device_id }}_double"
+    subtype: "{{ !input button_number }}_double"
     trigger: device
   - domain: mqtt
     device_id: !input button_device_id
@@ -59,7 +59,7 @@ triggers:
     device_id: !input button_device_id
     type: action
     id: button_hold_press
-    subtype: "{{ !input button_device_id }}_hold"
+    subtype: "{{ !input button_number }}_hold"
     trigger: device
 actions:
   - repeat:
