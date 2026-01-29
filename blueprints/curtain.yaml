@@ -19,10 +19,14 @@ blueprint:
         select:
           mode: dropdown 
           options:
-            - label: "Yes"
-              value: "Moon Roof"
-            - label: "No"
-              value: " "
+            - label: "1"
+              value: "1"
+            - label: "2"
+              value: "2"
+            - label: "3"
+              value: "3"
+            - label: "4"
+              value: "5"
     curtain_entity_ids:
       name: Curtain
       selector:
