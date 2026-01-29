@@ -27,7 +27,7 @@ blueprint:
             - label: "3"
               value: "3"
             - label: "4"
-              value: "5"
+              value: "4"
     curtain_entity_ids:
       name: Curtain
       selector:
