@@ -75,7 +75,7 @@ triggers:
     type: action
     id: hold_press
     subtype: !input hold_trigger
-    trigger: !input button_device_id
+    trigger: device
 actions:
   - repeat:
       for_each: !input curtain_entity_ids
