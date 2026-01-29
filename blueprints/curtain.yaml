@@ -13,21 +13,48 @@ blueprint:
               model: Wireless switch with 1 button
             - integration: mqtt
               model: Star Ring 4 Gang Scene Switch
-    button_number:
-      name: Button Number
-      description: Has no effect when its a single button
+    toggle_trigger:
+      name: Toggle trigger
       selector:
         select:
           mode: dropdown 
           options:
-            - label: "1"
-              value: "1"
-            - label: "2"
-              value: "2"
-            - label: "3"
-              value: "3"
-            - label: "4"
-              value: "4"
+            - "single"
+            - "hold"
+            - "double"
+            - "1_single"
+            - "1_hold"
+            - "1_double"
+            - "2_single"
+            - "2_hold"
+            - "2_double"
+            - "3_single"
+            - "3_hold"
+            - "3_double"
+            - "4_single"
+            - "4_hold"
+            - "4_double"    
+    hold_trigger:
+      name: Hole trigger
+      selector:
+        select:
+          mode: dropdown 
+          options:
+            - "single"
+            - "hold"
+            - "double"
+            - "1_single"
+            - "1_hold"
+            - "1_double"
+            - "2_single"
+            - "2_hold"
+            - "2_double"
+            - "3_single"
+            - "3_hold"
+            - "3_double"
+            - "4_single"
+            - "4_hold"
+            - "4_double" 
     curtain_entity_ids:
       name: Curtain
       selector:
@@ -40,27 +67,15 @@ triggers:
   - domain: mqtt
     device_id: !input button_device_id
     type: action
-    id: button_double_press
-    subtype: double
+    id: toggle_press
+    subtype: !input toggle_trigger
     trigger: device
   - domain: mqtt
     device_id: !input button_device_id
     type: action
-    id: button_double_press
-    subtype: "{{ !input button_number }}_double"
-    trigger: device
-  - domain: mqtt
-    device_id: !input button_device_id
-    type: action
-    id: button_hold_press
-    subtype: hold
-    trigger: device
-  - domain: mqtt
-    device_id: !input button_device_id
-    type: action
-    id: button_hold_press
-    subtype: "{{ !input button_number }}_hold"
-    trigger: device
+    id: hold_press
+    subtype: !input hold_trigger
+    trigger: !input button_device_id
 actions:
   - repeat:
       for_each: !input curtain_entity_ids
@@ -70,11 +85,11 @@ actions:
             trigger_id: "{{ trigger.id }}"
             curtain_state: "{{ states(curtain_entity) }}"
             curtain_open: "{{ is_state(curtain_entity, 'open') }}"
-            button_double_press: "{{ trigger_id == 'button_double_press' }}"
-            button_hold_press: "{{ trigger_id == 'button_hold_press' }}"
+            button_double_press: "{{ trigger_id == 'toggle_press' }}"
+            button_hold_press: "{{ trigger_id == 'hold_press' }}"
         - if: 
           - condition: template
-            value_template: "{{ curtain_open and button_double_press }}"
+            value_template: "{{ curtain_open and toggle_press }}"
           then:
             - service: cover.close_cover
               target:
@@ -82,7 +97,7 @@ actions:
               data: {}
         - if:
           - condition: template
-            value_template: "{{ (not curtain_open) and button_double_press }}"
+            value_template: "{{ (not curtain_open) and toggle_press }}"
           then:
             - service: cover.open_cover
               target:
@@ -90,7 +105,7 @@ actions:
               data: {}
         - if: 
           - condition: template
-            value_template: "{{ button_hold_press }}"
+            value_template: "{{ hold_press }}"
           then:
             - service: cover.stop_cover
               target:
