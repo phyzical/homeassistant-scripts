@@ -86,7 +86,7 @@ actions:
               target:
                 entity_id: "{{ light_entity }}"
               data:
-                brightness_step: 5
+                brightness_step: 25
         - if:
             - condition: template
               value_template: "{{ left }}"
@@ -95,6 +95,6 @@ actions:
               target:
                 entity_id: "{{ light_entity }}"
               data:
-                brightness_step: -5
+                brightness_step: -25
     
 mode: single
