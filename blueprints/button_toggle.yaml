@@ -18,8 +18,8 @@ blueprint:
           filter:
             - domain: switch
           multiple: true
-    triggers:
-      name: Triggers
+    trigger:
+      name: Trigger
       selector:
         select:
           mode: dropdown 
@@ -38,26 +38,13 @@ blueprint:
             - "3_double"
             - "4_single"
             - "4_hold"
-            - "4_double"  
-          multiple: true
+            - "4_double" 
 triggers:
   - domain: mqtt
     device_id: !input button_device_id
     type: action
-    id: button_double_press
-    subtype: double
-    trigger: device
-  - domain: mqtt
-    device_id: !input button_device_id
-    type: action
-    id: button_hold_press
-    subtype: hold
-    trigger: device
-  - domain: mqtt
-    device_id: !input button_device_id
-    type: action
-    id: button_single_press
-    subtype: single
+    id: action
+    subtype: !input trigger
     trigger: device
 actions:
   - repeat:
@@ -66,13 +53,10 @@ actions:
         - variables:
             switch_entity: "{{ repeat.item }}"
             trigger_id: "{{ trigger.id }}"
-            input_triggers: !input triggers
-            button_single_press: "{{ trigger_id == 'button_single_press' and 'button_single_press' in input_triggers }}"
-            button_double_press: "{{ trigger_id == 'button_double_press' and 'button_double_press' in input_triggers }}"
-            button_hold_press: "{{ trigger_id == 'button_hold_press' and 'button_hold_press' in input_triggers }}"
+            button: "{{ trigger_id == 'action' }}"
         - if:
             - condition: template
-              value_template: "{{ button_single_press or button_double_press or button_hold_press }}"
+              value_template: "{{ button }}"
           then:
             - service: switch.toggle
               target:
