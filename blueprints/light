@@ -1,0 +1,109 @@
+blueprint:
+  name: Light
+  domain: automation
+  input:
+    button_device_id:
+      name: Button
+      selector:
+        device:
+          filter:
+            - integration: mqtt
+              model: Smart button
+            - integration: mqtt
+              model: Wireless switch with 1 button
+            - integration: mqtt
+              model: Smart knob
+    light_entity_ids:
+      name: Light
+      selector:
+        entity:
+          filter:
+            - domain: light
+          multiple: true
+    triggers:
+      name: Triggers
+      selector:
+        select:
+          mode: dropdown 
+          options:
+            - "single"
+            - "hold"
+            - "double"
+            - "1_single"
+            - "1_hold"
+            - "1_double"
+            - "2_single"
+            - "2_hold"
+            - "2_double"
+            - "3_single"
+            - "3_hold"
+            - "3_double"
+            - "4_single"
+            - "4_hold"
+            - "4_double"  
+            - "rotate_left"
+            - "rotate_right"
+          multiple: true
+triggers:
+  - domain: mqtt
+    device_id: !input button_device_id
+    type: action
+    id: button_double_press
+    subtype: double
+    trigger: device
+  - domain: mqtt
+    device_id: !input button_device_id
+    type: action
+    id: button_hold_press
+    subtype: hold
+    trigger: device
+  - domain: mqtt
+    device_id: !input button_device_id
+    type: action
+    id: button_single_press
+    subtype: single
+    trigger: device
+  - domain: mqtt
+    device_id: !input button_device_id
+    type: action
+    id: button_rotate_left
+    subtype: rotate_left
+    trigger: device
+  - domain: mqtt
+    device_id: !input button_device_id
+    type: action
+    id: button_rotate_right
+    subtype: rotate_right
+    trigger: device
+actions:
+  - repeat:
+      for_each: !input light_entity_ids
+      sequence:
+        - variables:
+            light_entity: "{{ repeat.item }}"
+            trigger_id: "{{ trigger.id }}"
+            input_triggers: !input triggers
+            button_single_press: "{{ trigger_id == 'button_single_press' and 'button_single_press' in input_triggers }}"
+            button_double_press: "{{ trigger_id == 'button_double_press' and 'button_double_press' in input_triggers }}"
+            button_hold_press: "{{ trigger_id == 'button_hold_press' and 'button_hold_press' in input_triggers }}"
+            button_right: "{{ trigger_id == 'button_rotate_right' and 'button_rotate_right' in input_triggers }}"
+            button_left: "{{ trigger_id == 'button_rotate_left' and 'button_rotate_left' in input_triggers }}"
+        - if:
+            - condition: template
+              value_template: "{{ button_single_press or button_double_press or button_hold_press }}"
+          then:
+            - service: light.toggle
+              target:
+                entity_id: "{{ light_entity }}"
+              data: {}
+        - if:
+            - condition: template
+              value_template: "{{ button_right }}"
+          then:
+            - service: light.turn_on
+              target:
+                entity_id: "{{ light_entity }}"
+              data:
+                brightness_step: 5
+    
+mode: single
