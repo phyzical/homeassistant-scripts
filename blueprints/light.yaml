@@ -67,7 +67,6 @@ actions:
         - variables:
             light_entity: "{{ repeat.item }}"
             trigger_id: "{{ trigger.id }}"
-            input_triggers: !input triggers
             button: "{{ trigger_id == 'button'  }}"
             right: "{{ trigger_id == 'right' }}"
             left: "{{ trigger_id == 'left' }}"
