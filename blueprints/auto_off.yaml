@@ -1,0 +1,60 @@
+blueprint:
+  name: Auto Off After X Minutes
+  description: Automatically turns off specified lights/switches after they have been
+    on for X minutes or more
+  domain: automation
+  input:
+    entities:
+      name: Entities
+      description: Select the entities that should be automatically turned off
+      selector:
+        entity:
+          domain:
+          - light
+          - switch
+          multiple: true
+          reorder: false
+    timeout_duration:
+      name: Timeout Duration
+      description: How long entities can stay on before being automatically turned off
+        (in minutes)
+      default: 30
+      selector:
+        number:
+          min: 1.0
+          max: 120.0
+          unit_of_measurement: minutes
+          mode: slider
+          step: 1.0
+  source_url: https://github.com/the-rexmundi/home-assistant-blueprints/blob/main/auto-off-after-x-minutes
+variables:
+  entities: !input entities
+  timeout_minutes: !input timeout_duration
+mode: single
+max_exceeded: silent
+triggers:
+- platform: time_pattern
+  minutes: '*'
+actions:
+- repeat:
+    for_each: '{{ entities }}'
+    sequence:
+    - variables:
+        entity: '{{ repeat.item }}'
+        current_time: '{{ now() }}'
+        state: '{{ states(entity) }}'
+        last_changed: '{{ states[entity].last_changed }}'
+        time_diff_minutes: '{{ ((as_timestamp(current_time) - as_timestamp(last_changed))/
+          60) | int }}'
+    - condition: template
+      value_template: '{{ state == ''on'' and time_diff_minutes >= timeout_minutes
+        }}'
+    - service: homeassistant.turn_off
+      target:
+        entity_id: '{{ entity }}'
+    - service: logbook.log
+      data:
+        name: Auto Light Off
+        message: Automatically turned off {{ state_attr(entity, 'friendly_name')
+          or entity }} after {{ time_diff_minutes }} minutes
+conditions: []
